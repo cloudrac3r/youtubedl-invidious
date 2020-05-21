@@ -88,7 +88,11 @@ module.exports = [
 							init: null,
 							url: f.url,
 							itag: f.format_id,
-							type: null,
+							type:
+								f.acodec === "none"
+									? `video/${f.ext}; codecs="${f.vcodec}"` // video only
+									: `audio/${f.ext}; codecs="${f.acodec}"` // audio only
+							,
 							clen: f.filesize+"",
 							lmt: null,
 							projectionType: null,
@@ -100,7 +104,7 @@ module.exports = [
 						formatStreams: info.formats.filter(f => f.acodec !== "none" && f.vcodec !== "none").map(f => ({
 							url: f.url,
 							itag: f.format_id,
-							type: null,
+							type: `video/${f.ext}; codecs="${f.vcodec}, ${f.acodec}"`,
 							quality: null,
 							container: f.ext,
 							encoding: null,
