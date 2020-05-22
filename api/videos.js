@@ -86,7 +86,11 @@ module.exports = [
 							index: null,
 							bitrate: Math.floor(f.tbr*1000)+"",
 							init: null,
-							url: f.url,
+							url:
+								f.protocol === "http_dash_segments"
+									? f.fragment_base_url
+									: f.url
+							,
 							itag: f.format_id,
 							type:
 								f.acodec === "none"
