@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-   "scripts": {
+  "scripts": {
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "pinski": "github:cloudrac3r/pinski#6273f81facd1e753e021910f7aa6e4384cf60631",
+    "pinski": "github:cloudrac3r/pinski#0aec2595bc049c21d7955305da2d3a7c00281bdb",
     "youtube-dl": "^3.0.2"
   }
 }
