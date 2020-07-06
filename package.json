@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "pinski": "github:cloudrac3r/pinski#0aec2595bc049c21d7955305da2d3a7c00281bdb",
-    "youtube-dl": "^3.0.2"
+    "youtube-dl": "^3.0.2",
+    "ytsr": "^0.1.15"
   }
 }
