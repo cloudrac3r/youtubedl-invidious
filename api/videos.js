@@ -1,43 +1,16 @@
 const {promisify: p} = require("util")
+const {rewriteLocation, thumbnails} = require("./utils")
 const ytdl = require("youtube-dl")
-
-const thumbnailTypes = [
-	{
-		width: 1280,
-		height: 720,
-		name: "maxres",
-		url: "maxres"
-	},{
-		width: 1280,
-		height: 720,
-		name: "maxresdefault",
-		url: "maxresdefault"
-	},{
-		width: 640,
-		height: 480,
-		name: "sddefault",
-		url: "sddefault"
-	},{
-		width: 480,
-		height: 360,
-		name: "high",
-		url: "hqdefault"
-	},{
-		width: 320,
-		height: 180,
-		name: "medium",
-		url: "mqdefault"
-	},{
-		width: 120,
-		height: 90,
-		name: "default",
-		url: "default"
-	}
-]
 
 module.exports = [
 	{
-		route: "/api/v1/videos/([a-zA-Z0-9_-]+)", methods: ["GET"], code: ({fill}) => {
+		route: "/api/v1/videos/([a-zA-Z0-9_-]+)", methods: ["GET"], code: ({req, url, fill}) => {
+			const headers = req.headers
+			const local = url.searchParams.has("local") && ["true", "1"].includes(url.searchParams.get("local"))
+			function optionalLocal(location) {
+				const host = headers["host"] + "/" || headers["Host"] + "/" || url
+				return local ? rewriteLocation(location) : location
+			}
 			return p(ytdl.getInfo)(fill[0]).then(/** @param {any} info */ info => {
 				return {
 					statusCode: 200,
@@ -46,12 +19,7 @@ module.exports = [
 						type: "video",
 						title: info.title,
 						videoId: info.id,
-						videoThumbnails: thumbnailTypes.map(t => ({
-							width: t.width,
-							height: t.height,
-							quality: t.name,
-							url: `https://i.ytimg.com/vi/${t.url}.jpg`
-						})),
+						videoThumbnails: thumbnails(info.id),
 						description: info.description,
 						descriptionHtml: info.descriptionHtml,
 						published: Math.floor(new Date(`${info.upload_date.slice(0, 4)}-${info.upload_date.slice(4, 6)}-${info.upload_date.slice(6, 8)} UTC`).getTime()/1000),
@@ -88,8 +56,8 @@ module.exports = [
 							init: null,
 							url:
 								f.protocol === "http_dash_segments"
-									? f.fragment_base_url
-									: f.url
+									? optionalLocal(f.fragment_base_url)
+									: optionalLocal(f.url)
 							,
 							itag: f.format_id,
 							type:
@@ -106,7 +74,7 @@ module.exports = [
 							resolution: f.format_note
 						})),
 						formatStreams: info.formats.filter(f => f.acodec !== "none" && f.vcodec !== "none").map(f => ({
-							url: f.url,
+							url: optionalLocal(f.url),
 							itag: f.format_id,
 							type: `video/${f.ext}; codecs="${f.vcodec}, ${f.acodec}"`,
 							quality: null,
@@ -123,11 +91,21 @@ module.exports = [
 				}
 			}).catch(e => {
 				console.error(e)
-				return {
-					statusCode: 500,
-					contentType: "application/json",
-					content: {
-						error: "Unknown error (ytdi)"
+				if (e.stderr && e.stderr.includes("Sign in to confirm your age")) {
+					return {
+						statusCode: 403,
+						contentType: "application/json",
+						content: {
+							error: "This video is age restricted."
+						}
+					}
+				} else {
+					return {
+						statusCode: 500,
+						contentType: "application/json",
+						content: {
+							error: "Unknown error (ytdi)"
+						}
 					}
 				}
 			})

@@ -1,10 +1,5 @@
 const {proxy} = require("pinski/plugins")
-
-function rewriteLocation(location) {
-	const to = new URL(location)
-	to.searchParams.set("host", to.hostname)
-	return to.pathname + to.search
-}
+const {rewriteLocation} = require("./utils")
 
 module.exports = [
 	{
