@@ -90,6 +90,7 @@ module.exports = [
 					}
 				}
 			}).catch(e => {
+				const saidString = "YouTube said: "
 				console.error(e)
 				if (e.stderr && e.stderr.includes("Sign in to confirm your age")) {
 					return {
@@ -97,6 +98,20 @@ module.exports = [
 						contentType: "application/json",
 						content: {
 							error: "This video is age restricted."
+						}
+					}
+				} else if (e.stderr && e.stderr.includes(saidString)) {
+					let said = e.stderr.slice(e.stderr.indexOf(saidString))
+					let saidSuffix = said.slice(saidString.length)
+					if (saidSuffix === "Unable to extract video data") {
+						said = saidSuffix + ". This video was probably removed."
+					}
+					return {
+						statusCode: 403,
+						contentType: "application/json",
+						content: {
+							error: said,
+							saidSuffix
 						}
 					}
 				} else {
