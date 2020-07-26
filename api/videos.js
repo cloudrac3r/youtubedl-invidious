@@ -1,4 +1,5 @@
 const {promisify: p} = require("util")
+const passthrough = require("../passthrough")
 const {rewriteLocation, thumbnails} = require("./utils")
 const ytdl = require("youtube-dl")
 
@@ -11,7 +12,8 @@ module.exports = [
 				const host = headers["host"] + "/" || headers["Host"] + "/" || url
 				return local ? rewriteLocation(location) : location
 			}
-			return p(ytdl.getInfo)(fill[0]).then(/** @param {any} info */ info => {
+			// @ts-ignore this is actually fine, I don't know why it complains
+			return p(ytdl.getInfo)(fill[0], [`-${passthrough.ip_mode}`]).then(/** @param {any} info */ info => {
 				return {
 					statusCode: 200,
 					contentType: "application/json",
