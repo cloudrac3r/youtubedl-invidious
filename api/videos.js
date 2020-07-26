@@ -94,7 +94,15 @@ module.exports = [
 			}).catch(e => {
 				const saidString = "YouTube said: "
 				console.error(e)
-				if (e.stderr && e.stderr.includes("Sign in to confirm your age")) {
+				if (e.stderr && e.stderr.includes("Unable to download webpage: HTTP Error 429: Too Many Requests")) {
+					return {
+						statusCode: 503,
+						contentType: "application/json",
+						content: {
+							error: "YouTube is currently rate limiting this ytdi server."
+						}
+					}
+				} else if (e.stderr && e.stderr.includes("Sign in to confirm your age")) {
 					return {
 						statusCode: 403,
 						contentType: "application/json",
