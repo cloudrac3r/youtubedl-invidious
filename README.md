@@ -1,3 +1,15 @@
+# This project has been superseded by Second.
+
+→ https://git.sr.ht/~cadence/Second
+
+For a brief explanation why, see here: https://cadence.moe/blog/2020-08-29-untitled-i#ytdl-scale-explanation
+
+For an even briefer explanation: It doesn't work well, it's missing a bunch of information, and it totally doesn't scale.
+
+The original readme continues below.
+
+\-
+
 # A very creatively named project
 
 Want to run Invidious to get data about YouTube videos, but it takes ages to build and uses too much memory and sometimes doesn't work and the api-only branch is outdated? This is for you.
